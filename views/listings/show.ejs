@@ -1,0 +1,169 @@
+<% layout("layouts/boilerplate") %>
+
+
+<!-- Listing Details -->
+<div class="row justify-content-center">
+  <div class="col-md-8">
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+
+        <h2 class="card-title mb-3"><%= hotel.title %></h2>
+        
+           <img
+          src="<%=hotel.image.url%>"
+          alt="hotel img"
+          class="img-fluid mb-3"
+        >
+         
+         <p class="card-text">
+          <i><%= hotel.owner.username %></i>
+        </p>
+
+        <p class="card-text">
+          <strong>Description:</strong><br>
+          <%= hotel.description %>
+        </p>
+
+        <ul class="list-group list-group-flush mb-3">
+          <li class="list-group-item">
+            <strong>Price:</strong>
+            ₹ <%= hotel.price.toLocaleString("en-IN") %>
+          </li>
+          <li class="list-group-item">
+            <strong>Location:</strong>
+            <%= hotel.location %>
+          </li>
+          <li class="list-group-item">
+            <strong>Country:</strong>
+            <%= hotel.country %>
+          </li>
+        </ul>
+      <%if(currUser && hotel.owner._id.equals(currUser._id)){%>
+        <div class="d-flex gap-2">
+          <a href="/listings/<%= hotel._id %>/edit" class="btn btn-warning">
+            Edit
+          </a>
+          
+          <form
+            method="POST"
+            action="/listings/<%= hotel._id %>?_method=DELETE"
+          >
+            <button class="btn btn-danger">Delete</button>
+          </form>
+        </div>
+      <%}%>
+      </div>
+    </div>
+
+  </div>
+</div>
+<%if(currUser){%>
+<!-- Review Form -->
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <form
+      action="/listings/<%= hotel._id %>/review"
+      method="POST"
+      class="needs-validation"
+      novalidate
+    >
+
+<div class="mb-3 starbox d-flex align-items-center gap-3">
+  <label class="form-label mb-0">Rating</label>
+
+  <div class="star-rating">
+    <input type="radio" name="review[rating]" value="5" id="star5">
+    <label for="star5">★</label>
+
+    <input type="radio" name="review[rating]" value="4" id="star4">
+    <label for="star4">★</label>
+
+    <input type="radio" name="review[rating]" value="3" id="star3">
+    <label for="star3">★</label>
+
+    <input type="radio" name="review[rating]" value="2" id="star2">
+    <label for="star2">★</label>
+
+    <input type="radio" name="review[rating]" value="1" id="star1">
+    <label for="star1">★</label>
+  </div>
+</div>
+
+      <div class="mb-3">
+        <label class="form-label">Comment</label>
+        <textarea
+          class="form-control"
+          rows="4"
+          name="review[comment]"
+          placeholder="Write your experience..."
+          required
+        ></textarea>
+        <div class="invalid-feedback">Please enter feedback</div>
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-primary">Submit Review</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+<%}%>
+<hr>
+
+<!-- Reviews Section -->
+<div class="row mt-5">
+  <h4 class="mb-4">Reviews</h4>
+
+  <% if (!hotel.reviews || hotel.reviews.length === 0) { %>
+    <p class="text-muted">No reviews yet.</p>
+  <% } else { %>
+
+    <% hotel.reviews.forEach(review => { %>
+      <div class="col-md-6 mb-4">
+        <div class="d-flex gap-3">
+
+          <!-- Avatar -->
+          <div
+            class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center"
+            style="width:48px; height:48px;"
+          >
+            R
+          </div>
+          
+          <div>
+            <!-- Stars -->
+            <div class="small mb-1">
+              <%if(review.authour){%>
+              <span><%=review.authour.username%> </span>
+              <%} else{%>
+                  <span>anonymous</span>
+                <%}%>
+              <% for (let i = 1; i <= 5; i++) { %>
+                <%= i <= review.rating ? "★" : "☆" %>
+              <% } %>
+            </div>
+            
+            <!-- Comment -->
+            <% if (review.comment) { %>
+              <p class="review-text"><%= review.comment %></p>
+            <% } %>
+          </div>
+        </div>
+        
+        <!-- Delete Review -->
+        <%if(review.authour && currUser && review.authour._id.equals(currUser._id)){%>
+        <form
+          method="POST"
+          action="/listings/<%= hotel._id %>/review/<%= review._id %>?_method=DELETE"
+          class="mt-2"
+        >
+          <button class="btn btn-danger btn-sm">Delete</button>
+        </form>
+        <%}%>
+      </div>
+    <% }) %>
+
+  <% } %>
+</div>
