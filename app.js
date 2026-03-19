@@ -99,7 +99,7 @@ app.use((req,res,next)=>{
 })
 
 app.get("/",(req,res)=>{
-     res.send("hello the server is running")
+     res.redirect("/listings")
 })
 
 
