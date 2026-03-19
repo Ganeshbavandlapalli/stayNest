@@ -59,10 +59,10 @@ module.exports.editList = async (req,res)=>{
     // update text fields
     Object.assign(listing, updatedData);
     // ✅ if new image uploaded
-    
+    if(req.file){
         listing.image.filename = req.file.filename;
         listing.image.url=req.file.path
-    
+    }
     await listing.save();
     req.flash("success","successfully edited the listing");
     res.redirect(`/listings/${id}`);
